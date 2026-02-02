@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Camera Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            font-size: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .camera-icon {
+            font-size: 40px;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-text .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .client-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .last-update {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 12px;
+        }
+
+        /* Controls */
+        .controls {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+
+        select {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            color: #333;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            color: #667eea;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 56px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Gallery */
+        .gallery-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .gallery-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .gallery-count {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .gallery-item:active {
+            transform: scale(0.98);
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .gallery-image.error {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            background: #f5f5f5;
+        }
+
+        .gallery-info {
+            padding: 16px;
+            color: #333;
+        }
+
+        .gallery-camera {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .gallery-location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gallery-timestamp {
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gallery-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .gallery-empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .gallery-empty-text {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .gallery-empty-subtext {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        /* Error */
+        .error {
+            background: rgba(255, 59, 48, 0.15);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 59, 48, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .error-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* No Access */
+        .no-access {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .no-access-icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            opacity: 0.5;
+        }
+
+        .no-access-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .no-access-message {
+            font-size: 16px;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* Config */
+        .config-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-panel h3 {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .config-panel input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            color: #333;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .config-panel button {
+            width: 100%;
+        }
+
+        .config-panel .help-text {
+            font-size: 13px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app"></div>
+
+    <script>
+        // CONFIGURATION
+        const CONFIG = {
+            spreadsheetId: '16rvbKtrh0GHvvnjVu9FcQRx4oM6FKe__NV6CNYR13lw',
+            apiKey: '',
+            sheetName: 'Sheet1',
+            autoRefresh: 60000
+        };
+
+        // Get client from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientName = urlParams.get('client');
+
+        // App State
+        let state = {
+            data: [],
+            clientName: clientName,
+            selectedCamera: 'all',
+            selectedLocation: 'all',
+            loading: true,
+            error: null,
+            lastUpdate: null,
+            apiKey: localStorage.getItem('googleApiKey') || CONFIG.apiKey,
+            needsConfig: false
+        };
+
+        init();
+
+        function init() {
+            if (!state.clientName) {
+                state.needsConfig = true;
+                state.loading = false;
+                render();
+                return;
+            }
+
+            if (!state.apiKey) {
+                state.needsConfig = true;
+                state.loading = false;
+                render();
+                return;
+            }
+
+            fetchData();
+            setInterval(fetchData, CONFIG.autoRefresh);
+        }
+
+        async function fetchData() {
+            if (!state.apiKey || !state.clientName) return;
+
+            try {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A2:AF?key=${state.apiKey}`;
+                
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.error) {
+                    throw new Error(result.error.message);
+                }
+
+                const allData = parseData(result.values || []);
+                
+                // Filter only data for this client
+                state.data = allData.filter(d => d.client_name === state.clientName);
+                
+                console.log('Total rows:', allData.length);
+                console.log('Client rows:', state.data.length);
+                console.log('Looking for client:', state.clientName);
+
+                state.lastUpdate = new Date();
+                state.error = null;
+                state.loading = false;
+                state.needsConfig = false;
+                render();
+            } catch (err) {
+                console.error('Fetch error:', err);
+                state.error = err.message;
+                state.loading = false;
+                render();
+            }
+        }
+
+        function parseData(rows) {
+            return rows.map(row => ({
+                timestamp: row[0] || '',
+                unit_id: row[1] || '',
+                location_name: row[2] || '',
+                status: row[3] || '',
+                battery_percent: parseFloat(row[4]) || 0,
+                battery_voltage: parseFloat(row[5]) || 0,
+                images_today: parseInt(row[6]) || 0,
+                last_image_time: row[7] || '',
+                disk_free_gb: parseFloat(row[8]) || 0,
+                cpu_temp: parseFloat(row[9]) || 0,
+                uptime_hours: parseFloat(row[10]) || 0,
+                capture_errors: parseInt(row[11]) || 0,
+                reboots_24h: parseInt(row[12]) || 0,
+                signal_rssi: parseInt(row[13]) || 0,
+                send_duration: parseFloat(row[14]) || 0,
+                thumbnail_url: row[15] || '',
+                ntp_synced: row[16] || '',
+                next_shutdown: row[17] || '',
+                disk_free_percent: parseFloat(row[18]) || 0,
+                capture_age_min: parseInt(row[19]) || 0,
+                box_temp: parseFloat(row[20]) || 0,
+                light_ratio: parseFloat(row[21]) || 0,
+                image_link: row[22] || '',
+                total_images: parseInt(row[23]) || 0,
+                est_days_remaining: parseFloat(row[24]) || 0,
+                backup_disk_free: parseFloat(row[25]) || 0,
+                backup_disk_percent: parseFloat(row[26]) || 0,
+                backup_total_images: parseInt(row[27]) || 0,
+                backup_last_image: row[28] || '',
+                sync_status: row[29] || '',
+                manual_status: row[30] || '', // Column AE (the "Manual" status)
+                client_name: row[31] || '', // Column AF - CLIENT NAME HERE
+            }));
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input');
+            if (input.value.trim()) {
+                state.apiKey = input.value.trim();
+                localStorage.setItem('googleApiKey', state.apiKey);
+                state.needsConfig = false;
+                state.loading = true;
+                render();
+                fetchData();
+            }
+        }
+
+        function handleCameraChange(value) {
+            state.selectedCamera = value;
+            state.selectedLocation = 'all';
+            render();
+        }
+
+        function handleLocationChange(value) {
+            state.selectedLocation = value;
+            render();
+        }
+
+        function handleRefresh() {
+            state.loading = true;
+            render();
+            fetchData();
+        }
+
+        function openImage(url) {
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+
+            // No Client Name
+            if (!state.clientName) {
+                app.innerHTML = `
+                    <div class="no-access">
+                        <div class="no-access-icon">🔒</div>
+                        <div class="no-access-title">Access Required</div>
+                        <div class="no-access-message">
+                            This gallery requires a client identifier.<br>
+                            Please use the link provided by your administrator.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Config Screen
+            if (state.needsConfig && state.apiKey === '') {
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="header-content">
+                            <div class="camera-icon">📷</div>
+                            <div class="header-text">
+                                <h1>Camera Gallery</h1>
+                                <div class="subtitle">Setup Required</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-panel">
+                        <h3>Google Sheets API Key</h3>
+                        <input 
+                            type="text" 
+                            id="api-key-input" 
+                            placeholder="Enter API key..."
+                            value="${state.apiKey || ''}"
+                        >
+                        <button onclick="saveApiKey()">Connect</button>
+                        <div class="help-text">
+                            Contact your administrator for the API key.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Loading Screen
+            if (state.loading) {
+                app.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Loading gallery...</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // No data for client
+            if (state.data.length === 0) {
+                app.innerHTML = `
+                    <div class="header">
+                        <div class="header-content">
+                            <div class="camera-icon">📷</div>
+                            <div class="header-text">
+                                <h1>Camera Gallery</h1>
+                                <div class="subtitle">Welcome, ${state.clientName}</div>
+                            </div>
+                        </div>
+                        <div class="client-badge">👤 ${state.clientName}</div>
+                    </div>
+                    <div class="no-access">
+                        <div class="no-access-icon">📷</div>
+                        <div class="no-access-title">No Cameras Available</div>
+                        <div class="no-access-message">
+                            No cameras are currently assigned to your account.<br>
+                            Please contact your administrator.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get cameras for this client
+            const cameras = ['all', ...new Set(state.data.map(d => d.unit_id))];
+            
+            // Filter by camera
+            let filteredData = state.selectedCamera === 'all'
+                ? state.data
+                : state.data.filter(d => d.unit_id === state.selectedCamera);
+            
+            // Get locations
+            const locations = ['all', ...new Set(filteredData.map(d => d.location_name).filter(Boolean))];
+            
+            // Filter by location
+            if (state.selectedLocation !== 'all') {
+                filteredData = filteredData.filter(d => d.location_name === state.selectedLocation);
+            }
+
+            // Get images
+            const galleryImages = filteredData
+                .filter(d => d.image_link && d.image_link.trim() !== '')
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            // Main UI
+            app.innerHTML = `
+                <div class="header">
+                    <div class="header-content">
+                        <div class="camera-icon">📷</div>
+                        <div class="header-text">
+                            <h1>Camera Gallery</h1>
+                            <div class="subtitle">Field Camera System</div>
+                        </div>
+                    </div>
+                    <div class="client-badge">👤 ${state.clientName}</div>
+                    <div class="last-update">Last updated: ${state.lastUpdate.toLocaleTimeString()}</div>
+                </div>
+
+                ${state.error ? `
+                    <div class="error">
+                        <div class="error-title">⚠️ Connection Error</div>
+                        <div class="error-message">${state.error}</div>
+                    </div>
+                ` : ''}
+
+                <div class="controls">
+                    <div class="control-row">
+                        <select onchange="handleCameraChange(this.value)">
+                            ${cameras.map(cam => `
+                                <option value="${cam}" ${cam === state.selectedCamera ? 'selected' : ''}>
+                                    ${cam === 'all' ? `All Cameras (${cameras.length - 1})` : cam}
+                                </option>
+                            `).join('')}
+                        </select>
+                        <button onclick="handleRefresh()" title="Refresh">🔄</button>
+                    </div>
+                    ${locations.length > 2 ? `
+                        <div class="control-row">
+                            <select onchange="handleLocationChange(this.value)">
+                                ${locations.map(loc => `
+                                    <option value="${loc}" ${loc === state.selectedLocation ? 'selected' : ''}>
+                                        ${loc === 'all' ? 'All Locations' : loc}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="gallery-container">
+                    <div class="gallery-header">
+                        <div class="gallery-title">📸 Images</div>
+                        <div class="gallery-count">${galleryImages.length} photos</div>
+                    </div>
+
+                    ${galleryImages.length === 0 ? `
+                        <div class="gallery-empty">
+                            <div class="gallery-empty-icon">📷</div>
+                            <div class="gallery-empty-text">No images yet</div>
+                            <div class="gallery-empty-subtext">Images will appear here once your cameras start capturing</div>
+                        </div>
+                    ` : `
+                        <div class="gallery-grid">
+                            ${galleryImages.map(img => `
+                                <div class="gallery-item" onclick="openImage('${img.image_link}')">
+                                    <img 
+                                        src="${img.image_link}" 
+                                        alt="${img.unit_id}"
+                                        class="gallery-image"
+                                        onerror="this.parentElement.innerHTML='<div class=\\'gallery-image error\\'>Image unavailable</div>'"
+                                    >
+                                    <div class="gallery-info">
+                                        <div class="gallery-camera">${img.unit_id}</div>
+                                        <div class="gallery-location">📍 ${img.location_name || 'Unknown'}</div>
+                                        <div class="gallery-timestamp">🕐 ${new Date(img.timestamp).toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
