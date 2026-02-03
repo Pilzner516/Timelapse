@@ -1,6 +1,7 @@
 {
   "name": "Camera Monitor",
   "short_name": "Cameras",
+  "id": "/Timelapse/camera-monitor",
   "start_url": "./camera-monitor-improved%20(3).html",
   "scope": "./",
   "display": "standalone",
@@ -11,3 +12,4 @@
     { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
+
