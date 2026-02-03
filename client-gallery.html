@@ -372,14 +372,13 @@
             autoRefresh: 60000
         };
 
-        // Get client from URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const clientName = urlParams.get('client');
+        // Get client from localStorage (stored after first login)
+        const storedClientName = localStorage.getItem('clientName') || '';
 
         // App State
         let state = {
             data: [],
-            clientName: clientName,
+            clientName: storedClientName,
             selectedCamera: 'all',
             selectedLocation: 'all',
             loading: true,
@@ -392,14 +391,8 @@
         init();
 
         function init() {
-            if (!state.clientName) {
-                state.needsConfig = true;
-                state.loading = false;
-                render();
-                return;
-            }
-
-            if (!state.apiKey) {
+            // Check if we have both API key and client name
+            if (!state.apiKey || !state.clientName) {
                 state.needsConfig = true;
                 state.loading = false;
                 render();
@@ -482,16 +475,26 @@
             }));
         }
 
-        function saveApiKey() {
-            const input = document.getElementById('api-key-input');
-            if (input.value.trim()) {
-                state.apiKey = input.value.trim();
-                localStorage.setItem('googleApiKey', state.apiKey);
-                state.needsConfig = false;
-                state.loading = true;
-                render();
-                fetchData();
+        function saveConfig() {
+            const apiKeyInput = document.getElementById('api-key-input');
+            const clientNameInput = document.getElementById('client-name-input');
+            
+            const apiKey = apiKeyInput.value.trim();
+            const clientName = clientNameInput.value.trim();
+            
+            if (!apiKey || !clientName) {
+                alert('Please enter both API key and username');
+                return;
             }
+            
+            state.apiKey = apiKey;
+            state.clientName = clientName;
+            localStorage.setItem('googleApiKey', apiKey);
+            localStorage.setItem('clientName', clientName);
+            state.needsConfig = false;
+            state.loading = true;
+            render();
+            fetchData();
         }
 
         function handleCameraChange(value) {
@@ -520,44 +523,36 @@
         function render() {
             const app = document.getElementById('app');
 
-            // No Client Name
-            if (!state.clientName) {
-                app.innerHTML = `
-                    <div class="no-access">
-                        <div class="no-access-icon">🔒</div>
-                        <div class="no-access-title">Access Required</div>
-                        <div class="no-access-message">
-                            This gallery requires a client identifier.<br>
-                            Please use the link provided by your administrator.
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            // Config Screen
-            if (state.needsConfig && state.apiKey === '') {
+            // Config Screen - need both username and API key
+            if (state.needsConfig || !state.clientName || !state.apiKey) {
                 app.innerHTML = `
                     <div class="header">
                         <div class="header-content">
                             <div class="camera-icon">📷</div>
                             <div class="header-text">
-                                <h1>Timelapse 1000 GALLERY</h1>
-                                <div class="subtitle">Setup Required</div>
+                                <h1>Camera Gallery</h1>
+                                <div class="subtitle">Login Required</div>
                             </div>
                         </div>
                     </div>
                     <div class="config-panel">
-                        <h3>Google Sheets API Key</h3>
+                        <h3>Login</h3>
+                        <input 
+                            type="text" 
+                            id="client-name-input" 
+                            placeholder="Enter your username..."
+                            value="${state.clientName || ''}"
+                            style="margin-bottom: 12px;"
+                        >
                         <input 
                             type="text" 
                             id="api-key-input" 
                             placeholder="Enter API key..."
                             value="${state.apiKey || ''}"
                         >
-                        <button onclick="saveApiKey()">Connect</button>
+                        <button onclick="saveConfig()">Connect</button>
                         <div class="help-text">
-                            Contact your administrator for the API key.
+                            Enter your username and API key provided by your administrator.
                         </div>
                     </div>
                 `;
