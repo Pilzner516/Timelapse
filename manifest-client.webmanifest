@@ -2,7 +2,7 @@
   "name": "Client Gallery",
   "short_name": "Gallery",
   "id": "/Timelapse/client-gallery.html",
-  "start_url": "/Timelapse/client-gallery.html",
+  "start_url": "/Timelapse/client-gallery.html?client=Client1",
   "scope": "/Timelapse/",
   "background_color": "#000000",
   "theme_color": "#000000",
@@ -11,4 +11,5 @@
     { "src": "/Timelapse/iconB-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
+
 
