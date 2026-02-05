@@ -367,7 +367,7 @@
         // CONFIGURATION
         const CONFIG = {
             spreadsheetId: '16rvbKtrh0GHvvnjVu9FcQRx4oM6FKe__NV6CNYR13lw',
-            apiKey: '',
+            apiKey: 'AIzaSyBw7cvd8Jw72ZvSUSPaDdHS2048fy5Qc1g',
             sheetName: 'Sheet1',
             autoRefresh: 60000
         };
@@ -384,15 +384,15 @@
             loading: true,
             error: null,
             lastUpdate: null,
-            apiKey: localStorage.getItem('googleApiKey') || CONFIG.apiKey,
+            apiKey: CONFIG.apiKey,  // Use hardcoded API key
             needsConfig: false
         };
 
         init();
 
         function init() {
-            // Check if we have both API key and client name
-            if (!state.apiKey || !state.clientName) {
+            // Only need client name now (API key is hardcoded)
+            if (!state.clientName) {
                 state.needsConfig = true;
                 state.loading = false;
                 render();
@@ -476,20 +476,15 @@
         }
 
         function saveConfig() {
-            const apiKeyInput = document.getElementById('api-key-input');
             const clientNameInput = document.getElementById('client-name-input');
-            
-            const apiKey = apiKeyInput.value.trim();
             const clientName = clientNameInput.value.trim();
             
-            if (!apiKey || !clientName) {
-                alert('Please enter both API key and username');
+            if (!clientName) {
+                alert('Please enter your username');
                 return;
             }
             
-            state.apiKey = apiKey;
             state.clientName = clientName;
-            localStorage.setItem('googleApiKey', apiKey);
             localStorage.setItem('clientName', clientName);
             state.needsConfig = false;
             state.loading = true;
@@ -517,9 +512,7 @@
         function changeUser() {
             if (confirm('Log out and switch to a different user?')) {
                 localStorage.removeItem('clientName');
-                localStorage.removeItem('googleApiKey');
                 state.clientName = '';
-                state.apiKey = '';
                 state.needsConfig = true;
                 render();
             }
@@ -534,8 +527,8 @@
         function render() {
             const app = document.getElementById('app');
 
-            // Config Screen - need both username and API key
-            if (state.needsConfig || !state.clientName || !state.apiKey) {
+            // Config Screen - only need username now
+            if (state.needsConfig || !state.clientName) {
                 app.innerHTML = `
                     <div class="header">
                         <div class="header-content">
@@ -547,23 +540,16 @@
                         </div>
                     </div>
                     <div class="config-panel">
-                        <h3>Login</h3>
+                        <h3>Enter Your Username</h3>
                         <input 
                             type="text" 
                             id="client-name-input" 
                             placeholder="Enter your username..."
                             value="${state.clientName || ''}"
-                            style="margin-bottom: 12px;"
                         >
-                        <input 
-                            type="text" 
-                            id="api-key-input" 
-                            placeholder="Enter API key..."
-                            value="${state.apiKey || ''}"
-                        >
-                        <button onclick="saveConfig()">Connect</button>
+                        <button onclick="saveConfig()">Login</button>
                         <div class="help-text">
-                            Enter your username and API key provided by your administrator.
+                            Enter the username provided by your administrator.
                         </div>
                     </div>
                 `;
