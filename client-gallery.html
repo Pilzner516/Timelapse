@@ -514,6 +514,17 @@
             fetchData();
         }
 
+        function changeUser() {
+            if (confirm('Log out and switch to a different user?')) {
+                localStorage.removeItem('clientName');
+                localStorage.removeItem('googleApiKey');
+                state.clientName = '';
+                state.apiKey = '';
+                state.needsConfig = true;
+                render();
+            }
+        }
+
         function openImage(url) {
             if (url) {
                 window.open(url, '_blank');
@@ -581,7 +592,7 @@
                                 <div class="subtitle">Welcome, ${state.clientName}</div>
                             </div>
                         </div>
-                        <div class="client-badge">👤 ${state.clientName}</div>
+                        <div class="client-badge" onclick="changeUser()" style="cursor: pointer;" title="Click to change user">👤 ${state.clientName}</div>
                     </div>
                     <div class="no-access">
                         <div class="no-access-icon">📷</div>
@@ -626,7 +637,7 @@
                             <div class="subtitle">Field Camera System</div>
                         </div>
                     </div>
-                    <div class="client-badge">👤 ${state.clientName}</div>
+                    <div class="client-badge" onclick="changeUser()" style="cursor: pointer;" title="Click to change user">👤 ${state.clientName}</div>
                     <div class="last-update">Last updated: ${state.lastUpdate.toLocaleTimeString()}</div>
                 </div>
 
