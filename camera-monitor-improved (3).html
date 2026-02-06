@@ -543,7 +543,7 @@
             if (!state.apiKey) return;
 
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A2:AD?key=${state.apiKey}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A2:AL?key=${state.apiKey}`;
                 
                 const response = await fetch(url);
                 const result = await response.json();
