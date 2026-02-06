@@ -610,6 +610,10 @@
                 if (idx === 0) {
                     console.log('First row thumbnail_url (col P/15) - embedded image, not accessible:', row[15] ? 'HAS IMAGE' : 'EMPTY');
                     console.log('First row image_link (col W/22):', row[22]);
+                    console.log('DEBUG: next_startup (col AJ/35):', row[35]);
+                    console.log('DEBUG: cp_on_time (col AK/36):', row[36]);
+                    console.log('DEBUG: cp_off_time (col AL/37):', row[37]);
+                    console.log('DEBUG: Row length:', row.length);
                 }
                 
                 return parsed;
