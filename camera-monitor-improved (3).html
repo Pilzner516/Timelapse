@@ -543,7 +543,7 @@
             if (!state.apiKey) return;
 
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A2:AL?key=${state.apiKey}`;
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.spreadsheetId}/values/${CONFIG.sheetName}!A2:AD?key=${state.apiKey}`;
                 
                 const response = await fetch(url);
                 const result = await response.json();
@@ -959,28 +959,27 @@
 
                                 <div class="metric">
                                     <div class="metric-header">
-                                        <div class="metric-icon">🔌</div>
-                                        <div class="metric-label">SCHEDULE</div>
+                                        <div class="metric-icon">📷</div>
+                                        <div class="metric-label">CAMERA SCHEDULE</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 15px;">
+                                    <div class="metric-value" style="font-size: 16px;">
                                         ${reading.cp_on_time || 'N/A'} - ${reading.cp_off_time || 'N/A'}
                                     </div>
                                     <div class="metric-detail" style="font-size: 12px;">
-                                        Shutdown: ${reading.next_shutdown || 'N/A'}<br>
-                                        Startup: ${reading.next_startup || 'N/A'}
+                                        Capture Period
                                     </div>
                                 </div>
 
                                 <div class="metric">
                                     <div class="metric-header">
                                         <div class="metric-icon">🔌</div>
-                                        <div class="metric-label">SCHEDULE</div>
+                                        <div class="metric-label">WITTYPI SCHEDULE</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 15px;">
-                                        ${reading.cp_on_time || 'N/A'} - ${reading.cp_off_time || 'N/A'}
+                                    <div class="metric-value" style="font-size: 13px;">
+                                        ${reading.next_shutdown || 'N/A'}
                                     </div>
                                     <div class="metric-detail" style="font-size: 12px;">
-                                        Shutdown: ${reading.next_shutdown || 'N/A'}<br>
+                                        Next Shutdown<br>
                                         Startup: ${reading.next_startup || 'N/A'}
                                     </div>
                                 </div>
