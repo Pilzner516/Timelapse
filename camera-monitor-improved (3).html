@@ -601,6 +601,9 @@
                     backup_total_images: parseInt(row[27]) || 0,
                     backup_last_image: row[28] || '',
                     sync_status: row[29] || '',
+                    next_startup: row[35] || '',        // NEW - Column AJ (index 35)
+                    cp_on_time: row[36] || '',          // NEW - Column AK (index 36)
+                    cp_off_time: row[37] || '',         // NEW - Column AL (index 37)
                 };
                 
                 // Debug first row
@@ -947,7 +950,21 @@
                                         <div class="metric-label">SYSTEM</div>
                                     </div>
                                     <div class="metric-value">${reading.uptime_hours.toFixed(0)}h</div>
-                                    <div class="metric-detail">Uptime • Next: ${reading.next_shutdown || 'N/A'}</div>
+                                    <div class="metric-detail">Uptime</div>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-header">
+                                        <div class="metric-icon">🔌</div>
+                                        <div class="metric-label">SCHEDULE</div>
+                                    </div>
+                                    <div class="metric-value" style="font-size: 15px;">
+                                        ${reading.cp_on_time || 'N/A'} - ${reading.cp_off_time || 'N/A'}
+                                    </div>
+                                    <div class="metric-detail" style="font-size: 12px;">
+                                        Shutdown: ${reading.next_shutdown || 'N/A'}<br>
+                                        Startup: ${reading.next_startup || 'N/A'}
+                                    </div>
                                 </div>
                             </div>
                         </div>
