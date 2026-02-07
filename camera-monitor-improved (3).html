@@ -964,26 +964,33 @@
                                         <div class="metric-icon">📷</div>
                                         <div class="metric-label">CAMERA SCHEDULE</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 16px;">
-                                        ${reading.cp_on_time || 'N/A'} - ${reading.cp_off_time || 'N/A'}
+                                    <div class="metric-value" style="font-size: 20px; line-height: 1.4;">
+                                        ON: ${reading.cp_on_time || 'N/A'}<br>
+                                        <span style="font-size: 16px; color: #a0a0a0;">to</span><br>
+                                        OFF: ${reading.cp_off_time || 'N/A'}
                                     </div>
-                                    <div class="metric-detail" style="font-size: 12px;">
-                                        Capture Period
+                                    <div class="metric-detail" style="font-size: 13px; color: #a0a0a0;">
+                                        Daily Capture Period
                                     </div>
                                 </div>
 
                                 <div class="metric">
                                     <div class="metric-header">
                                         <div class="metric-icon">🔌</div>
-                                        <div class="metric-label">WITTYPI SCHEDULE</div>
+                                        <div class="metric-label">WITTYPI POWER</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 15px;">
-                                        ${reading.next_shutdown || 'N/A'}
+                                    <div class="metric-value" style="font-size: 18px; line-height: 1.5;">
+                                        <div style="margin-bottom: 8px;">
+                                            <span style="font-size: 14px; color: #a0a0a0;">Shutdown:</span><br>
+                                            ${reading.next_shutdown ? reading.next_shutdown.split(' ')[1] : 'N/A'}
+                                        </div>
+                                        <div>
+                                            <span style="font-size: 14px; color: #a0a0a0;">Startup:</span><br>
+                                            ${reading.next_startup ? reading.next_startup.split(' ')[1] : 'N/A'}
+                                        </div>
                                     </div>
-                                    <div class="metric-detail" style="font-size: 13px; color: #c0c0c0;">
-                                        Shutdown<br>
-                                        Startup: ${reading.next_startup || 'N/A'}<br>
-                                        <span style="color: ${reading.witty_enabled === 'Enabled' ? '#0f0' : '#fa0'};">
+                                    <div class="metric-detail" style="font-size: 13px;">
+                                        <span style="color: ${reading.witty_enabled === 'Enabled' ? '#0f0' : '#fa0'}; font-weight: 600;">
                                             ${reading.witty_enabled || 'Unknown'}
                                         </span>
                                     </div>
