@@ -63,7 +63,7 @@
 
         .subtitle {
             font-size: 13px;
-            color: #a0a0a0;
+            color: #666;
             letter-spacing: 0.5px;
         }
 
@@ -100,7 +100,7 @@
 
         .last-update {
             font-size: 12px;
-            color: #a0a0a0;
+            color: #666;
         }
 
         /* Controls */
@@ -118,7 +118,7 @@
 
         .controls label {
             font-size: 13px;
-            color: #a0a0a0;
+            color: #666;
             white-space: nowrap;
         }
 
@@ -207,7 +207,7 @@
 
         .location {
             font-size: 16px;
-            color: #b0b0b0;
+            color: #888;
         }
 
         .health-badge {
@@ -238,7 +238,7 @@
 
         .timestamp {
             font-size: 15px;
-            color: #a0a0a0;
+            color: #666;
             margin-bottom: 14px;
             padding-bottom: 14px;
             border-bottom: 1px solid rgba(100, 100, 100, 0.2);
@@ -290,7 +290,7 @@
 
         .metric-label {
             font-size: 14px;
-            color: #b0b0b0;
+            color: #888;
             letter-spacing: 1px;
             font-weight: 700;
         }
@@ -305,7 +305,7 @@
 
         .metric-detail {
             font-size: 15px;
-            color: #a0a0a0;
+            color: #666;
             margin-bottom: 12px;
         }
 
@@ -359,7 +359,7 @@
 
         .gallery-count {
             font-size: 13px;
-            color: #a0a0a0;
+            color: #666;
         }
 
         .gallery-grid {
@@ -392,7 +392,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #a0a0a0;
+            color: #666;
             font-size: 13px;
         }
 
@@ -408,13 +408,13 @@
 
         .gallery-details {
             font-size: 13px;
-            color: #a0a0a0;
+            color: #666;
         }
 
         .gallery-empty {
             text-align: center;
             padding: 40px 20px;
-            color: #a0a0a0;
+            color: #666;
         }
 
         .gallery-empty-icon {
@@ -448,7 +448,7 @@
         .loading-text {
             margin-top: 20px;
             font-size: 14px;
-            color: #a0a0a0;
+            color: #666;
             letter-spacing: 1px;
         }
 
@@ -495,7 +495,7 @@
 
         .config-panel .help-text {
             font-size: 12px;
-            color: #a0a0a0;
+            color: #666;
             line-height: 1.5;
             margin-top: 16px;
         }
@@ -601,17 +601,16 @@
                     backup_total_images: parseInt(row[27]) || 0,
                     backup_last_image: row[28] || '',
                     sync_status: row[29] || '',
-                    witty_enabled: row[32] || '',           // NEW - Column AG (index 32)
-                    next_startup: row[35] || '',            // NEW - Column AJ (index 35)
-                    cp_on_time: row[36] || '',              // NEW - Column AK (index 36)
-                    cp_off_time: row[37] || '',             // NEW - Column AL (index 37)
+                    witty_enabled: row[32] || '',           // Column AG (index 32)
+                    next_startup: row[35] || '',            // Column AJ (index 35)
+                    cp_on_time: row[36] || '',              // Column AK (index 36)
+                    cp_off_time: row[37] || '',             // Column AL (index 37)
                 };
                 
                 // Debug first row
                 if (idx === 0) {
                     console.log('First row thumbnail_url (col P/15) - embedded image, not accessible:', row[15] ? 'HAS IMAGE' : 'EMPTY');
                     console.log('First row image_link (col W/22):', row[22]);
-                    console.log('DEBUG: witty_enabled (col AG/32):', row[32]);
                     console.log('DEBUG: next_startup (col AJ/35):', row[35]);
                     console.log('DEBUG: cp_on_time (col AK/36):', row[36]);
                     console.log('DEBUG: cp_off_time (col AL/37):', row[37]);
@@ -865,35 +864,8 @@
                     const timeSince = new Date() - new Date(reading.timestamp);
                     const hoursAgo = Math.floor(timeSince / (1000 * 60 * 60));
                     
-                    // Determine card background tint based on health
-                    let cardBgColor = 'rgba(0, 0, 0, 0.6)';
-                    if (health.status === 'healthy') {
-                        cardBgColor = 'rgba(0, 50, 0, 0.4)';
-                    } else if (health.status === 'warning') {
-                        cardBgColor = 'rgba(50, 40, 0, 0.4)';
-                    } else if (health.status === 'critical') {
-                        cardBgColor = 'rgba(50, 0, 0, 0.4)';
-                    }
-                    
-                    // Determine network mode
-                    let networkMode = 'Unknown';
-                    let networkIcon = '📶';
-                    if (reading.signal_rssi && reading.signal_rssi < 0) {
-                        networkMode = 'Field';
-                        networkIcon = '📡';
-                    } else if (reading.uptime_hours > 0) {
-                        networkMode = 'WiFi';
-                        networkIcon = '📶';
-                    }
-                    
-                    // Battery status
-                    let batteryStatus = 'No Battery';
-                    if (reading.battery_percent > 0) {
-                        batteryStatus = reading.battery_percent >= 95 ? 'Full' : 'Charging';
-                    }
-                    
                     return `
-                        <div class="unit-card ${health.status}" style="background: ${cardBgColor};">
+                        <div class="unit-card ${health.status}">
                             <div class="unit-header">
                                 <div>
                                     <div class="unit-id">${reading.unit_id}</div>
@@ -923,9 +895,7 @@
                                         <div class="metric-label">BATTERY</div>
                                     </div>
                                     <div class="metric-value">${reading.battery_percent.toFixed(0)}%</div>
-                                    <div class="metric-detail">
-                                        ${reading.battery_voltage.toFixed(2)}V • ${batteryStatus}
-                                    </div>
+                                    <div class="metric-detail">${reading.battery_voltage.toFixed(2)}V</div>
                                     <div class="metric-bar">
                                         <div class="bar-fill battery" style="width: ${reading.battery_percent}%"></div>
                                     </div>
@@ -933,15 +903,11 @@
 
                                 <div class="metric">
                                     <div class="metric-header">
-                                        <div class="metric-icon">📸</div>
-                                        <div class="metric-label">LAST CAPTURE</div>
+                                        <div class="metric-icon">📷</div>
+                                        <div class="metric-label">IMAGES</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 32px;">
-                                        ${reading.capture_age_min} min
-                                    </div>
-                                    <div class="metric-detail">
-                                        ${reading.images_today} today • ${reading.total_images.toLocaleString()} total
-                                    </div>
+                                    <div class="metric-value">${reading.total_images.toLocaleString()}</div>
+                                    <div class="metric-detail">Today: ${reading.images_today} • ${reading.capture_age_min}min ago</div>
                                 </div>
 
                                 <div class="metric">
@@ -949,16 +915,8 @@
                                         <div class="metric-icon">💾</div>
                                         <div class="metric-label">STORAGE</div>
                                     </div>
-                                    <div class="metric-value" style="font-size: 32px;">
-                                        ${reading.est_days_remaining.toFixed(0)} days
-                                    </div>
-                                    <div class="metric-detail">
-                                        ${(100 - reading.disk_free_percent).toFixed(0)}% used • ${reading.disk_free_gb.toFixed(1)}GB free
-                                    </div>
-                                    <div class="metric-bar">
-                                        <div class="bar-fill ${reading.disk_free_percent < 20 ? 'warning' : 'storage'}" style="width: ${100 - reading.disk_free_percent}%"></div>
-                                    </div>
-                                </div>
+                                    <div class="metric-value">${(100 - reading.disk_free_percent).toFixed(0)}%</div>
+                                    <div class="metric-detail">${reading.disk_free_gb.toFixed(1)}GB free • ${reading.est_days_remaining.toFixed(0)} days left</div>
                                     <div class="metric-bar">
                                         <div class="bar-fill storage" style="width: ${100 - reading.disk_free_percent}%"></div>
                                     </div>
@@ -971,7 +929,7 @@
                                     </div>
                                     <div class="metric-value">
                                         ${reading.box_temp.toFixed(1)}°C
-                                        <span style="font-size: 24px; color: #a0a0a0;"> / ${(reading.box_temp * 9/5 + 32).toFixed(1)}°F</span>
+                                        <span style="font-size: 24px; color: #888;"> / ${(reading.box_temp * 9/5 + 32).toFixed(1)}°F</span>
                                     </div>
                                     <div class="metric-detail">
                                         CPU: ${reading.cpu_temp.toFixed(0)}°C / ${(reading.cpu_temp * 9/5 + 32).toFixed(0)}°F
@@ -985,17 +943,6 @@
                                     </div>
                                     <div class="metric-value">${reading.signal_rssi} dBm</div>
                                     <div class="metric-detail">Upload: ${reading.send_duration.toFixed(0)}s</div>
-                                </div>
-
-                                <div class="metric">
-                                    <div class="metric-header">
-                                        <div class="metric-icon">${networkIcon}</div>
-                                        <div class="metric-label">NETWORK MODE</div>
-                                    </div>
-                                    <div class="metric-value" style="font-size: 28px;">${networkMode}</div>
-                                    <div class="metric-detail">
-                                        ${networkMode === 'Field' ? 'Cellular LTE-M' : 'WiFi Connected'}
-                                    </div>
                                 </div>
 
                                 <div class="metric">
@@ -1018,29 +965,15 @@
 
                                 <div class="metric">
                                     <div class="metric-header">
-                                        <div class="metric-icon">💿</div>
-                                        <div class="metric-label">BACKUP STORAGE</div>
-                                    </div>
-                                    <div class="metric-value" style="font-size: 24px;">
-                                        ${reading.backup_total_images.toLocaleString()}
-                                    </div>
-                                    <div class="metric-detail">
-                                        ${reading.backup_disk_free.toFixed(1)}GB free (${reading.backup_disk_percent.toFixed(0)}% used)<br>
-                                        Sync: ${reading.sync_status || 'Unknown'}
-                                    </div>
-                                </div>
-
-                                <div class="metric">
-                                    <div class="metric-header">
                                         <div class="metric-icon">📷</div>
                                         <div class="metric-label">CAMERA SCHEDULE</div>
                                     </div>
                                     <div class="metric-value" style="font-size: 20px; line-height: 1.4;">
                                         ON: ${reading.cp_on_time || 'N/A'}<br>
-                                        <span style="font-size: 16px; color: #a0a0a0;">to</span><br>
+                                        <span style="font-size: 16px; color: #888;">to</span><br>
                                         OFF: ${reading.cp_off_time || 'N/A'}
                                     </div>
-                                    <div class="metric-detail" style="font-size: 13px; color: #a0a0a0;">
+                                    <div class="metric-detail" style="font-size: 13px;">
                                         Daily Capture Period
                                     </div>
                                 </div>
@@ -1052,11 +985,11 @@
                                     </div>
                                     <div class="metric-value" style="font-size: 18px; line-height: 1.5;">
                                         <div style="margin-bottom: 8px;">
-                                            <span style="font-size: 14px; color: #a0a0a0;">Shutdown:</span><br>
+                                            <span style="font-size: 14px; color: #888;">Shutdown:</span><br>
                                             ${reading.next_shutdown ? reading.next_shutdown.split(' ')[1] : 'N/A'}
                                         </div>
                                         <div>
-                                            <span style="font-size: 14px; color: #a0a0a0;">Startup:</span><br>
+                                            <span style="font-size: 14px; color: #888;">Startup:</span><br>
                                             ${reading.next_startup ? reading.next_startup.split(' ')[1] : 'N/A'}
                                         </div>
                                     </div>
@@ -1065,6 +998,7 @@
                                             ${reading.witty_enabled || 'Unknown'}
                                         </span>
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
