@@ -289,7 +289,7 @@
         }
 
         .metric-label {
-            font-size: 12px;
+            font-size: 14px;
             color: #b0b0b0;
             letter-spacing: 1px;
             font-weight: 700;
@@ -865,8 +865,35 @@
                     const timeSince = new Date() - new Date(reading.timestamp);
                     const hoursAgo = Math.floor(timeSince / (1000 * 60 * 60));
                     
+                    // Determine card background tint based on health
+                    let cardBgColor = 'rgba(0, 0, 0, 0.6)';
+                    if (health.status === 'healthy') {
+                        cardBgColor = 'rgba(0, 50, 0, 0.4)';
+                    } else if (health.status === 'warning') {
+                        cardBgColor = 'rgba(50, 40, 0, 0.4)';
+                    } else if (health.status === 'critical') {
+                        cardBgColor = 'rgba(50, 0, 0, 0.4)';
+                    }
+                    
+                    // Determine network mode
+                    let networkMode = 'Unknown';
+                    let networkIcon = '📶';
+                    if (reading.signal_rssi && reading.signal_rssi < 0) {
+                        networkMode = 'Field';
+                        networkIcon = '📡';
+                    } else if (reading.uptime_hours > 0) {
+                        networkMode = 'WiFi';
+                        networkIcon = '📶';
+                    }
+                    
+                    // Battery status
+                    let batteryStatus = 'No Battery';
+                    if (reading.battery_percent > 0) {
+                        batteryStatus = reading.battery_percent >= 95 ? 'Full' : 'Charging';
+                    }
+                    
                     return `
-                        <div class="unit-card ${health.status}">
+                        <div class="unit-card ${health.status}" style="background: ${cardBgColor};">
                             <div class="unit-header">
                                 <div>
                                     <div class="unit-id">${reading.unit_id}</div>
@@ -896,7 +923,9 @@
                                         <div class="metric-label">BATTERY</div>
                                     </div>
                                     <div class="metric-value">${reading.battery_percent.toFixed(0)}%</div>
-                                    <div class="metric-detail">${reading.battery_voltage.toFixed(2)}V</div>
+                                    <div class="metric-detail">
+                                        ${reading.battery_voltage.toFixed(2)}V • ${batteryStatus}
+                                    </div>
                                     <div class="metric-bar">
                                         <div class="bar-fill battery" style="width: ${reading.battery_percent}%"></div>
                                     </div>
@@ -904,11 +933,15 @@
 
                                 <div class="metric">
                                     <div class="metric-header">
-                                        <div class="metric-icon">📷</div>
-                                        <div class="metric-label">IMAGES</div>
+                                        <div class="metric-icon">📸</div>
+                                        <div class="metric-label">LAST CAPTURE</div>
                                     </div>
-                                    <div class="metric-value">${reading.total_images.toLocaleString()}</div>
-                                    <div class="metric-detail">Today: ${reading.images_today} • ${reading.capture_age_min}min ago</div>
+                                    <div class="metric-value" style="font-size: 32px;">
+                                        ${reading.capture_age_min} min
+                                    </div>
+                                    <div class="metric-detail">
+                                        ${reading.images_today} today • ${reading.total_images.toLocaleString()} total
+                                    </div>
                                 </div>
 
                                 <div class="metric">
@@ -916,8 +949,16 @@
                                         <div class="metric-icon">💾</div>
                                         <div class="metric-label">STORAGE</div>
                                     </div>
-                                    <div class="metric-value">${(100 - reading.disk_free_percent).toFixed(0)}%</div>
-                                    <div class="metric-detail">${reading.disk_free_gb.toFixed(1)}GB free • ${reading.est_days_remaining.toFixed(0)} days left</div>
+                                    <div class="metric-value" style="font-size: 32px;">
+                                        ${reading.est_days_remaining.toFixed(0)} days
+                                    </div>
+                                    <div class="metric-detail">
+                                        ${(100 - reading.disk_free_percent).toFixed(0)}% used • ${reading.disk_free_gb.toFixed(1)}GB free
+                                    </div>
+                                    <div class="metric-bar">
+                                        <div class="bar-fill ${reading.disk_free_percent < 20 ? 'warning' : 'storage'}" style="width: ${100 - reading.disk_free_percent}%"></div>
+                                    </div>
+                                </div>
                                     <div class="metric-bar">
                                         <div class="bar-fill storage" style="width: ${100 - reading.disk_free_percent}%"></div>
                                     </div>
@@ -928,8 +969,13 @@
                                         <div class="metric-icon">🌡️</div>
                                         <div class="metric-label">TEMPERATURE</div>
                                     </div>
-                                    <div class="metric-value">${reading.box_temp.toFixed(1)}°C</div>
-                                    <div class="metric-detail">CPU: ${reading.cpu_temp.toFixed(0)}°C</div>
+                                    <div class="metric-value">
+                                        ${reading.box_temp.toFixed(1)}°C
+                                        <span style="font-size: 24px; color: #a0a0a0;"> / ${(reading.box_temp * 9/5 + 32).toFixed(1)}°F</span>
+                                    </div>
+                                    <div class="metric-detail">
+                                        CPU: ${reading.cpu_temp.toFixed(0)}°C / ${(reading.cpu_temp * 9/5 + 32).toFixed(0)}°F
+                                    </div>
                                 </div>
 
                                 <div class="metric">
@@ -939,6 +985,17 @@
                                     </div>
                                     <div class="metric-value">${reading.signal_rssi} dBm</div>
                                     <div class="metric-detail">Upload: ${reading.send_duration.toFixed(0)}s</div>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-header">
+                                        <div class="metric-icon">${networkIcon}</div>
+                                        <div class="metric-label">NETWORK MODE</div>
+                                    </div>
+                                    <div class="metric-value" style="font-size: 28px;">${networkMode}</div>
+                                    <div class="metric-detail">
+                                        ${networkMode === 'Field' ? 'Cellular LTE-M' : 'WiFi Connected'}
+                                    </div>
                                 </div>
 
                                 <div class="metric">
@@ -957,6 +1014,20 @@
                                     </div>
                                     <div class="metric-value">${reading.uptime_hours.toFixed(0)}h</div>
                                     <div class="metric-detail">Uptime</div>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-header">
+                                        <div class="metric-icon">💿</div>
+                                        <div class="metric-label">BACKUP STORAGE</div>
+                                    </div>
+                                    <div class="metric-value" style="font-size: 24px;">
+                                        ${reading.backup_total_images.toLocaleString()}
+                                    </div>
+                                    <div class="metric-detail">
+                                        ${reading.backup_disk_free.toFixed(1)}GB free (${reading.backup_disk_percent.toFixed(0)}% used)<br>
+                                        Sync: ${reading.sync_status || 'Unknown'}
+                                    </div>
                                 </div>
 
                                 <div class="metric">
